@@ -22,20 +22,25 @@ namespace WebApp
 
         private void btnSubmit_Click(object sender, EventArgs e)
         {
+            // This line of code will be used for making sure that the inputs are not empty. 
             if (string.IsNullOrWhiteSpace(teFullName.Text) ||
                string.IsNullOrWhiteSpace(teAge.Text) ||
                string.IsNullOrWhiteSpace(teGender.Text) ||
                string.IsNullOrWhiteSpace(teAddress.Text) ||
                string.IsNullOrWhiteSpace(teContactNumber.Text))
             {
+                // Validates if the inputs are not filled.
                 XtraMessageBox.Show("All fields are required. Please fill in all details.",
                                 "Missing Information", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
+            // Creates a Student object
             Student student = new Student();
+            // Generates a student ID in the format YYYY-####, where #### is a zero-padded sequence number.
             string currentYear = DateTime.Now.Year.ToString();
             string studentId = $"{currentYear}-{(students.Count + 1).ToString("D4")}";
+            // Populates the object student with data based on the inputted details.
             student.StudentID = studentId;
             student.FullName = teFullName.Text;
             student.Age = int.Parse(teAge.Text);
@@ -43,6 +48,8 @@ namespace WebApp
             student.Address = teAddress.Text;
             student.ContactNumber = int.Parse(teContactNumber.Text);
 
+            // Checks whether a student with the same Student ID or Full Name
+            // already exists in the students collection
             if (students.Any(s => s.StudentID == studentId || s.FullName.Equals(teFullName.Text, StringComparison.OrdinalIgnoreCase)))
             {
                 XtraMessageBox.Show("A student with the same Student ID or Full Name already exists!",
@@ -50,27 +57,34 @@ namespace WebApp
                 return;
             }
 
+            // Displays a confirmation message before adding the student's information.
             DialogResult result = XtraMessageBox.Show("Are you sure you want to add this student's information?",
-                                "Confirm Submission", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                                 "Confirm Submission", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.No)
             {
                 return;
             }
 
+            // Adds the new student to the list and updates the grid display.
             students.Add(student);
             gcStudents.DataSource = students;
             gcStudents.RefreshDataSource();
+            // Clears input fields after successful addition.
             clearInput();
         }
 
+        // Stores the Student ID of the currently selected student.
         private string selectedStudentID;
+
         private void btnDisplay_Click(object sender, EventArgs e)
         {
+            // Gets the index of the currently focused row in the grid view.
             int selectedRow = gvStudents.FocusedRowHandle;
+            // If a valid row is selected, it retrieves the student's details
+            // and display them in the input fields.
             if (selectedRow >= 0)
             {
                 Student student = students[selectedRow];
-
                 selectedStudentID = student.StudentID;
                 teFullName.Text = student.FullName;
                 teAge.Text = student.Age.ToString();
